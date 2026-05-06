@@ -12,7 +12,7 @@ jobs:
       matrix:
         os: [ubuntu-22.04, ubuntu-24.04, macos-13, macos-14, macos-15]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: install gfortran (mac only)
         if: startsWith(matrix.os, 'macos')
         run: |
@@ -38,7 +38,7 @@ jobs:
       matrix:
         os: [macos-14, macos-15]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: install gfortran
         run: |
           brew install gcc
@@ -58,7 +58,7 @@ jobs:
       matrix:
         os: [macos-14, macos-15]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: install gfortran
         run: |
           brew install gcc
@@ -79,7 +79,7 @@ jobs:
       matrix:
         os: [macos-14, macos-15]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: install gfortran + lld
         run: |
           brew install gcc lld
