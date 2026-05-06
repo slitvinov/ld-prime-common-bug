@@ -1,0 +1,76 @@
+name: ld_prime SIGBUS reproducer
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  default-ld:
+    name: ${{ matrix.os }} default ld
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04, macos-13, macos-14, macos-15]
+    steps:
+      - uses: actions/checkout@v4
+      - name: install gfortran (mac only)
+        if: startsWith(matrix.os, 'macos')
+        run: brew install gcc
+      - name: linker version
+        run: |
+          if [ "$(uname)" = "Darwin" ]; then
+            ld -v 2>&1 | head -5 || true
+          else
+            ld --version | head -3 || true
+          fi
+      - name: run reproducer
+        run: sh build.sh
+
+  ld_classic:
+    name: ${{ matrix.os }} -ld_classic
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, macos-15]
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew install gcc
+      - name: run with -ld_classic
+        env:
+          LDFLAGS: "-Wl,-ld_classic"
+        run: sh build.sh
+
+  flto:
+    name: ${{ matrix.os }} -flto
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, macos-15]
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew install gcc
+      - name: run with -flto
+        env:
+          FCFLAGS: "-flto"
+          LDFLAGS: "-flto"
+        run: sh build.sh
+
+  lld:
+    name: ${{ matrix.os }} -fuse-ld=lld
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, macos-15]
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew install gcc lld
+      - name: detect SDK
+        id: sdk
+        run: echo "ver=$(xcrun --show-sdk-version)" >> $GITHUB_OUTPUT
+      - name: run with -fuse-ld=lld
+        env:
+          LDFLAGS: "-fuse-ld=lld -Wl,-arch,arm64 -Wl,-platform_version,macos,${{ steps.sdk.outputs.ver }},${{ steps.sdk.outputs.ver }}"
+        run: sh build.sh
