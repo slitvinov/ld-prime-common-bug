@@ -31,8 +31,24 @@ LDFLAGS="-fuse-ld=lld -Wl,-arch,arm64 -Wl,-platform_version,macos,$(xcrun --show
 
 `.github/workflows/repro.yml` runs the reproducer on a matrix of:
 
-- `ubuntu-22.04`, `ubuntu-24.04` (control — GNU ld picks max, expected to pass)
+- `ubuntu-22.04`, `ubuntu-24.04` (control, GNU ld picks max, expected to pass)
 - `macos-13` (classic ld64 era, expected to pass)
 - `macos-14`, `macos-15` (ld_prime, expected to fail with SIGBUS)
 
 The three workaround invocations are also exercised on macOS 14/15 and expected to pass.
+
+## Inspect or trigger from the command line
+
+```
+# list runs
+gh run list --repo slitvinov/ld-prime-common-bug
+
+# trigger a fresh run (matrix runs all platforms)
+gh workflow run "ld_prime SIGBUS reproducer" --repo slitvinov/ld-prime-common-bug
+
+# follow the latest run live
+gh run watch --repo slitvinov/ld-prime-common-bug
+
+# show logs for the failed (SIGBUS) jobs
+gh run view --repo slitvinov/ld-prime-common-bug --log-failed
+```

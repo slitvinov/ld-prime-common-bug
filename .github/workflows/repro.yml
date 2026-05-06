@@ -15,7 +15,11 @@ jobs:
       - uses: actions/checkout@v4
       - name: install gfortran (mac only)
         if: startsWith(matrix.os, 'macos')
-        run: brew install gcc
+        run: |
+          brew install gcc
+          mkdir -p "$HOME/bin"
+          ln -sf "$(ls -1 $(brew --prefix)/bin/gfortran-* | sort -V | tail -1)" "$HOME/bin/gfortran"
+          echo "$HOME/bin" >> "$GITHUB_PATH"
       - name: linker version
         run: |
           if [ "$(uname)" = "Darwin" ]; then
@@ -35,7 +39,12 @@ jobs:
         os: [macos-14, macos-15]
     steps:
       - uses: actions/checkout@v4
-      - run: brew install gcc
+      - name: install gfortran
+        run: |
+          brew install gcc
+          mkdir -p "$HOME/bin"
+          ln -sf "$(ls -1 $(brew --prefix)/bin/gfortran-* | sort -V | tail -1)" "$HOME/bin/gfortran"
+          echo "$HOME/bin" >> "$GITHUB_PATH"
       - name: run with -ld_classic
         env:
           LDFLAGS: "-Wl,-ld_classic"
@@ -50,7 +59,12 @@ jobs:
         os: [macos-14, macos-15]
     steps:
       - uses: actions/checkout@v4
-      - run: brew install gcc
+      - name: install gfortran
+        run: |
+          brew install gcc
+          mkdir -p "$HOME/bin"
+          ln -sf "$(ls -1 $(brew --prefix)/bin/gfortran-* | sort -V | tail -1)" "$HOME/bin/gfortran"
+          echo "$HOME/bin" >> "$GITHUB_PATH"
       - name: run with -flto
         env:
           FCFLAGS: "-flto"
@@ -66,10 +80,15 @@ jobs:
         os: [macos-14, macos-15]
     steps:
       - uses: actions/checkout@v4
-      - run: brew install gcc lld
+      - name: install gfortran + lld
+        run: |
+          brew install gcc lld
+          mkdir -p "$HOME/bin"
+          ln -sf "$(ls -1 $(brew --prefix)/bin/gfortran-* | sort -V | tail -1)" "$HOME/bin/gfortran"
+          echo "$HOME/bin" >> "$GITHUB_PATH"
       - name: detect SDK
         id: sdk
-        run: echo "ver=$(xcrun --show-sdk-version)" >> $GITHUB_OUTPUT
+        run: echo "ver=$(xcrun --show-sdk-version)" >> "$GITHUB_OUTPUT"
       - name: run with -fuse-ld=lld
         env:
           LDFLAGS: "-fuse-ld=lld -Wl,-arch,arm64 -Wl,-platform_version,macos,${{ steps.sdk.outputs.ver }},${{ steps.sdk.outputs.ver }}"
