@@ -1,6 +1,10 @@
 name: ld_prime SIGBUS reproducer
 on:
   push:
+    paths:
+      - '**.f'
+      - 'build.sh'
+      - '.github/workflows/repro.yml'
   workflow_dispatch:
 
 jobs:
