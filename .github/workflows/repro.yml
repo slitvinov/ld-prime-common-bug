@@ -20,7 +20,7 @@ jobs:
       - name: install gfortran (mac only)
         if: startsWith(matrix.os, 'macos')
         run: |
-          brew install gcc
+          brew list gcc >/dev/null 2>&1 || brew install gcc
           mkdir -p "$HOME/bin"
           ln -sf "$(ls -1 $(brew --prefix)/bin/gfortran-* | sort -V | tail -1)" "$HOME/bin/gfortran"
           echo "$HOME/bin" >> "$GITHUB_PATH"
@@ -45,7 +45,7 @@ jobs:
       - uses: actions/checkout@v5
       - name: install gfortran
         run: |
-          brew install gcc
+          brew list gcc >/dev/null 2>&1 || brew install gcc
           mkdir -p "$HOME/bin"
           ln -sf "$(ls -1 $(brew --prefix)/bin/gfortran-* | sort -V | tail -1)" "$HOME/bin/gfortran"
           echo "$HOME/bin" >> "$GITHUB_PATH"
@@ -65,7 +65,7 @@ jobs:
       - uses: actions/checkout@v5
       - name: install gfortran
         run: |
-          brew install gcc
+          brew list gcc >/dev/null 2>&1 || brew install gcc
           mkdir -p "$HOME/bin"
           ln -sf "$(ls -1 $(brew --prefix)/bin/gfortran-* | sort -V | tail -1)" "$HOME/bin/gfortran"
           echo "$HOME/bin" >> "$GITHUB_PATH"
@@ -86,7 +86,8 @@ jobs:
       - uses: actions/checkout@v5
       - name: install gfortran + lld
         run: |
-          brew install gcc lld
+          brew list gcc >/dev/null 2>&1 || brew install gcc
+          brew list lld >/dev/null 2>&1 || brew install lld
           mkdir -p "$HOME/bin"
           ln -sf "$(ls -1 $(brew --prefix)/bin/gfortran-* | sort -V | tail -1)" "$HOME/bin/gfortran"
           echo "$HOME/bin" >> "$GITHUB_PATH"
